@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Channel;
 use App\Reply;
 use App\Thread;
 use App\User;
@@ -24,13 +25,13 @@ class ThreadTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->thread = factory(Thread::class)->create();
+        $this->thread = create(Thread::class);
     }
 
     /** @test */
-    public function a_thread_has_replies()
+    public function a_thread_can_make_a_path_string()
     {
-        $this->assertInstanceOf(Collection::class, $this->thread->replies);
+        $this->assertEquals("/threads/{$this->thread->channel->slug}/{$this->thread->id}", $this->thread->path());
     }
 
     /** @test */
@@ -40,14 +41,23 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
+    public function a_thread_has_replies()
+    {
+        $this->assertInstanceOf(Collection::class, $this->thread->replies);
+    }
+
+    /** @test */
     public function a_thread_can_add_a_reply()
     {
         $this->thread->addReply([
             'body' => 'foobar',
             'user_id' => 1
         ]);
-
-
     }
 
+    /** @test */
+    public function a_thread_belongs_to_a_channel()
+    {
+        $this->assertInstanceOf(Channel::class, $this->thread->channel);
+    }
 }
