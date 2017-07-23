@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Channel;
+use App\Filters\ThreadsFilter;
 use App\Thread;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,11 +19,15 @@ class ThreadsController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Channel $channel
+     * @param ThreadsFilter $filters
      * @return \Illuminate\Http\Response
+     * @internal param ThreadsFilter $filter
      */
-    public function index()
+    public function index(Channel $channel, ThreadsFilter $filters)
     {
-        $threads = Thread::latest()->get();
+        $threads = $this->getThreads($channel, $filters);
+
         return view('threads.index', compact('threads'));
     }
 
@@ -42,6 +49,12 @@ class ThreadsController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'title' => 'required',
+            'body' => 'required',
+            'channel_id' => 'required|exists:channels,id'
+        ]);
+
         $thread = Thread::create([
             'user_id' => Auth::id(),
             'channel_id' => $request->get('channel_id'),
@@ -96,5 +109,22 @@ class ThreadsController extends Controller
     public function destroy(Thread $thread)
     {
         //
+    }
+
+    /**
+     * @param Channel $channel
+     * @param ThreadsFilter $filters
+     * @return mixed
+     */
+    protected function getThreads(Channel $channel, ThreadsFilter $filters)
+    {
+        $threads = Thread::latest()->filter($filters);
+
+        if ($channel->exists) {
+            $threads->where('channel_id', $channel->id);
+        }
+
+        $threads = $threads->get();
+        return $threads;
     }
 }

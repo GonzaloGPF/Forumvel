@@ -15,7 +15,7 @@ class ParticipateInForumTest extends TestCase
     use DataBaseMigrations;
 
     /** @test */
-    public function unauthenticated_user_may_not_add_replies()
+    function unauthenticated_user_may_not_add_replies()
     {
         $this->withExceptionHandling()
             ->post('threads/channel/1/replies', [])
@@ -23,7 +23,7 @@ class ParticipateInForumTest extends TestCase
     }
 
     /** @test */
-    public function an_authenticated_user_may_participate_in_threads()
+    function an_authenticated_user_may_participate_in_threads()
     {
         $this->signIn();
 
@@ -35,5 +35,18 @@ class ParticipateInForumTest extends TestCase
 
         $this->get($thread->path())
             ->assertSee($reply->body);
+    }
+
+    /** @test */
+    function a_reply_requires_a_body()
+    {
+        $this->withExceptionHandling()->signIn();
+
+        $thread = create(Thread::class);
+
+        $reply = make(Reply::class, ['body' => null]);
+
+        $this->post($thread->path() . '/replies', $reply->toArray())
+            ->assertSessionHasErrors('body');
     }
 }

@@ -11,6 +11,12 @@ class Channel extends Model
         'slug'
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+
     public function threads()
     {
         return $this->hasMany(Thread::class);
