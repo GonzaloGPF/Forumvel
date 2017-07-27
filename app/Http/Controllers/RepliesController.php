@@ -23,7 +23,7 @@ class RepliesController extends Controller
             'body' => 'required'
         ]);
 
-        $reply = $thread->addReply([
+        $thread->addReply([
             'user_id' => Auth::id(),
             'body' => request('body')
         ]);

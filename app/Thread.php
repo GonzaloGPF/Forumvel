@@ -11,6 +11,16 @@ class Thread extends Model
         'title', 'body' , 'user_id', 'channel_id'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // A query scope that is applied to all queries
+        static::addGlobalScope('repliesCount', function(Builder $builder){
+            $builder->withCount('replies'); // will add a new attribute to every Thread representation 'replies_count'
+        });
+    }
+
     public function path($extra = null)
     {
         $extra = $extra == null ? '' : '/' . $extra;
