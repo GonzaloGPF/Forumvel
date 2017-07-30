@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Channel;
+use App\Reply;
 use App\Thread;
 use App\User;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -25,12 +27,38 @@ class CreateThreadsTest extends TestCase
 
         $this->post('threads')
             ->assertRedirect('login');
+    }
 
-//        $this->expectException('Illuminate\Auth\AuthenticationException');
-//
-//        $thread = make(Thread::class);
-//
-//        $this->post('/threads', $thread->toArray());
+    /** @test */
+
+    function unauthorized_may_not_delete_threads()
+    {
+        $this->withExceptionHandling();
+
+        $thread = create(Thread::class);
+
+        $this->delete($thread->path())
+            ->assertRedirect('/login');
+
+        $this->signIn();
+
+        $this->delete($thread->path())
+            ->assertStatus(403);
+    }
+
+    /** @test */
+    function authorized_users_can_delete_threads()
+    {
+        $this->signIn();
+
+        $thread = create(Thread::class, ['user_id' => Auth::id()]);
+        $reply = create(Reply::class, ['thread_id' => $thread->id]);
+
+        $this->json('DELETE', $thread->path())
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('threads', ['id' => $thread->id])
+            ->assertDatabaseMissing('replies', ['id' => $reply->id]);
     }
 
     /** @test */

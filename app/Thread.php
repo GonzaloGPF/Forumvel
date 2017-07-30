@@ -4,12 +4,17 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Thread extends Model
 {
+    use RecordsActivity;
+
     protected $fillable = [
         'title', 'body' , 'user_id', 'channel_id'
     ];
+
+    protected $with = ['creator', 'channel'];
 
     protected static function boot()
     {
@@ -17,7 +22,11 @@ class Thread extends Model
 
         // A query scope that is applied to all queries
         static::addGlobalScope('repliesCount', function(Builder $builder){
-            $builder->withCount('replies'); // will add a new attribute to every Thread representation 'replies_count'
+            $builder->withCount('replies'); // will add a new attribute to every Thread called 'replies_count'
+        });
+
+        static::deleting(function(Thread $thread){
+            $thread->replies()->delete();
         });
     }
 
@@ -29,7 +38,8 @@ class Thread extends Model
 
     public function replies()
     {
-        return $this->hasMany(Reply::class);
+        return $this->hasMany(Reply::class)
+            ->with('owner'); // every Reply will eager load his owner
     }
 
     public function creator()

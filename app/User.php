@@ -27,8 +27,23 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'name';
+    }
+
     public function replies()
     {
         return $this->hasMany(Reply::class);
+    }
+
+    public function threads()
+    {
+        return $this->hasMany(Thread::class);
+    }
+
+    public function activity()
+    {
+        return $this->hasMany(Activity::class);
     }
 }
