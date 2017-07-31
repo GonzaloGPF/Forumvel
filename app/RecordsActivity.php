@@ -23,11 +23,16 @@ trait RecordsActivity
         if(Auth::guest()) return;
 
         foreach (self::getActivitiesToRecord() as $event){
-            // Listen tp model's event fires
+            // Listen to model's events
             static::$event(function(Model $model){
                 $model->recordActivity('created');
             });
         }
+
+        static::deleting(function($model){
+//            dump(Activity::count());
+            $model->activity()->delete();
+        });
     }
 
     /**
