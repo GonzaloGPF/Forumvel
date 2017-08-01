@@ -27,6 +27,7 @@ class RepliesController extends Controller
             'user_id' => Auth::id(),
             'body' => request('body')
         ]);
-        return redirect($thread->path());
+
+        return redirect($thread->path())->with('flash', 'Your reply has been created!');
     }
 }
