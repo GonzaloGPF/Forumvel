@@ -1,7 +1,7 @@
 @component('profiles.activities.activity')
 
     @slot('heading')
-        <a href="{{ route('profile', $activity->subject->owner->creator) }}">
+        <a href="{{ route('profile', $activity->subject->owner->name) }}">
             {{ $activity->subject->owner->name }}
         </a>
         replied to:
