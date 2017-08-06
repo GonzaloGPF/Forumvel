@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\Auth;
 trait Favoritable
 {
 
+    protected static function bootFavoritable()
+    {
+        static::deleting(function($model){
+            $model->favorites->each->delete();
+        });
+    }
+
     public function favorites()
     {
         return $this->morphMany(Favorite::class, 'favorited');
@@ -24,6 +31,14 @@ trait Favoritable
         }
     }
 
+    public function unfavorite()
+    {
+        $attributes = ['user_id' => Auth::id()];
+
+        // Call delete() on every model instance to trigger deleting event
+        $this->favorites()->where($attributes)->get()->each->delete();
+    }
+
     public function isFavorited()
     {
         // $this->favorites now will return a collection because of $with property
@@ -33,5 +48,10 @@ trait Favoritable
     public function getFavoritesCountAttribute()
     {
         return $this->favorites->count();
+    }
+
+    public function getIsFavoritedAttribute()
+    {
+        return $this->isFavorited();
     }
 }

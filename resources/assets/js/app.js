@@ -15,6 +15,17 @@ require('./bootstrap');
 
 Vue.component('flash', require('./components/Flash.vue'));
 
+Vue.component('thread-view', require('./pages/Thread.vue'));
+
+Vue.mixin({
+    methods: {
+        authorize(handler){
+            let user = window.App.user;
+            return user ? handler(user) : false;
+        },
+    }
+});
+
 const app = new Vue({
     el: '#app'
 });

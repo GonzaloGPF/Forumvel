@@ -7,6 +7,8 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="signed-in" content="{{ Auth::check() }}">
+    <meta name="user" content="{{ Auth::user() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -25,6 +27,14 @@
 
         .flex {
             flex: 1;
+        }
+
+        .mr-1 {
+            margin-right: 1em;
+        }
+
+        [v-cloak] {
+            display: none;
         }
     </style>
 </head>

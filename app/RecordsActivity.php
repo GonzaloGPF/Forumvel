@@ -30,7 +30,6 @@ trait RecordsActivity
         }
 
         static::deleting(function($model){
-//            dump(Activity::count());
             $model->activity()->delete();
         });
     }

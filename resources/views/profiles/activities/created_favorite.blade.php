@@ -6,12 +6,12 @@
         </a>
 
         favorited a reply
-        <a href="{{ $activity->subject->favorited->path() }}">{{ $activity->subject->favorited->thread->title }}</a>
+        {{--<a href="{{ $activity->subject->subject->favorited->path() }}">{{ $activity->subject->favorited->thread->title }}</a>--}}
 
         {{--<span>{{ $activity->subject->created_at->diffForHumans() }}</span>--}}
     @endslot
 
     @slot('body')
-        {{ $activity->subject->favorited->body }}
+        {{--{{ $activity->subject->favorited->body }}--}}
     @endslot
 @endcomponent

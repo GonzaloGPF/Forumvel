@@ -55,8 +55,6 @@ class ActivityTest extends TestCase
 
         $feed = Activity::feed(Auth::user());
 
-//        dd($feed->toArray());
-
         $this->assertTrue($feed->keys()->contains(
             Carbon::now()->format('Y-m-d')
         ));

@@ -24,12 +24,23 @@ class RepliesController extends Controller
             'body' => 'required'
         ]);
 
-        $thread->addReply([
+        $reply = $thread->addReply([
             'user_id' => Auth::id(),
             'body' => request('body')
         ]);
 
+        if(request()->expectsJson()){
+            return $reply->load('owner');
+        }
+
         return redirect($thread->path())->with('flash', 'Your reply has been created!');
+    }
+
+    public function update(Reply $reply)
+    {
+        $this->authorize('update', $reply);
+
+        $reply->update(request()->all());
     }
 
     public function destroy(Reply $reply)
@@ -37,6 +48,10 @@ class RepliesController extends Controller
         $this->authorize('update', $reply);
 
         $reply->delete();
+
+        if(request()->expectsJson()){
+            return response(['status' => 'Reply deleted']);
+        }
 
         return back();
     }

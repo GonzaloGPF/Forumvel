@@ -1,0 +1,80 @@
+<template>
+    <div :id="'reply-'+reply.id" class="panel panel-default">
+        <div class="panel-heading">
+            <div class="level">
+                <h5 class="flex">
+                    <a :href="'/profiles/'+ reply.owner.name"
+                       v-text=" reply.owner.name">
+                    </a>
+                    said {{ reply.created_at }}...
+                </h5>
+
+                <div v-if="isLogged">
+                    <favorite :reply="reply"></favorite>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="" v-if="editing">
+                <div class="form-group">
+                    <textarea class="form-control" v-model="body"></textarea>
+                </div>
+                <button class="btn btn-primary" @click="update">Update</button>
+                <button class="btn btn-link" @click="editing = false">Cancel</button>
+            </div>
+            <div v-else v-text="body"></div>
+        </div>
+
+        <!--@can('update', $reply)-->
+        <!--<div class="panel-footer level">-->
+        <div class="panel-footer level" v-if="canUpdate">
+            <button class="btn-btn-xs mr-1" @click="editing = true">Edit</button>
+            <button class="btn btn-xs btn-danger mr-1" @click="destroy">Delete</button>
+        </div>
+        <!--</div>-->
+        <!--@endcan-->
+    </div>
+</template>
+<script>
+    import Favorite from './Favorite.vue';
+    export default {
+        props: ['data'],
+
+        components: { Favorite },
+
+        data(){
+            return {
+                editing: false,
+                body: this.data.body,
+                reply: this.data
+            }
+        },
+
+        computed: {
+            canUpdate(){
+                return this.authorize( user => this.data.user_id === user.id)
+            },
+            isLogged(){
+                return window.App.signedIn;
+            }
+        },
+
+        methods: {
+            update(){
+                axios.patch('/replies/' + this.reply.id, {
+                    body: this.body
+                });
+
+                this.editing = false;
+
+                flash('Updated!')
+            },
+
+            destroy(){
+                axios.delete('/replies/' + this.reply.id);
+
+                this.$emit('deleted', this.reply.id);
+            }
+        }
+    }
+</script>
