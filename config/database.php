@@ -30,8 +30,7 @@ return [
     | choice installed on your machine before you begin development.
     |
     */
-
-    'connections' => [
+'connections' => [
 
         'sqlite' => [
             'driver' => 'sqlite',
@@ -42,7 +41,7 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
+            'port' => env('DB_PORT', 'forumvel' == gethostname() ? 3306 : 33060),
             'database' => env('DB_DATABASE', 'forge'),
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
