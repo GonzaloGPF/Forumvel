@@ -34,7 +34,7 @@
 
                     <h3>Replies</h3>
 
-                    <replies :data="{{ $thread->replies }}" @removed="repliesCount--" @created="repliesCount++"></replies>
+                    <replies @removed="repliesCount--" @created="repliesCount++"></replies>
                 </div>
                 <div class="col-md-4">
                     <div class="panel panel-default">

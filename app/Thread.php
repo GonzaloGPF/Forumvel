@@ -21,9 +21,9 @@ class Thread extends Model
         parent::boot();
 
         // A query scope that is applied to all queries
-        static::addGlobalScope('repliesCount', function(Builder $builder){
-            $builder->withCount('replies'); // will add a new attribute to every Thread called 'replies_count'
-        });
+//        static::addGlobalScope('repliesCount', function(Builder $builder){
+//            $builder->withCount('replies'); // will add a new attribute to every Thread called 'replies_count'
+//        });
 
         static::deleting(function(Thread $thread){
             $thread->replies->each->delete();

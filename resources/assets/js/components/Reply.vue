@@ -6,7 +6,7 @@
                     <a :href="'/profiles/'+ reply.owner.name"
                        v-text=" reply.owner.name">
                     </a>
-                    said {{ reply.created_at }}...
+                    said <span v-text="ago"></span>...
                 </h5>
 
                 <div v-if="isLogged">
@@ -37,7 +37,10 @@
 </template>
 <script>
     import Favorite from './Favorite.vue';
+    import moment from 'moment';
+
     export default {
+
         props: ['data'],
 
         components: { Favorite },
@@ -56,6 +59,9 @@
             },
             isLogged(){
                 return window.App.signedIn;
+            },
+            ago(){
+                return moment(this.reply.created_at).fromNow();
             }
         },
 
