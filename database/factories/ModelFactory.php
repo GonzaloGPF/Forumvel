@@ -12,6 +12,9 @@
 */
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
+
+use Illuminate\Notifications\DatabaseNotification;
+
 $factory->define(App\User::class, function (Faker\Generator $faker) {
     static $password;
 
@@ -27,7 +30,9 @@ $factory->define(App\Thread::class, function(Faker\Generator $faker){
    return [
        'title' => $faker->sentence,
        'body' => $faker->paragraph,
-       'user_id' => factory(App\User::class)->create()->id,
+       'user_id' => function(){
+            return factory(App\User::class)->create()->id;
+       },
        'channel_id' => factory(\App\Channel::class)->create()->id
    ];
 });
@@ -35,8 +40,12 @@ $factory->define(App\Thread::class, function(Faker\Generator $faker){
 $factory->define(App\Reply::class, function(Faker\Generator $faker){
     return [
         'body' => $faker->paragraph,
-        'user_id' => factory(App\User::class)->create()->id,
-        'thread_id' => factory(App\Thread::class)->create()->id,
+        'user_id' => function() {
+            return factory(App\User::class)->create()->id;
+        },
+        'thread_id' => function(){
+            return factory(App\Thread::class)->create()->id;
+        },
     ];
 });
 
@@ -45,5 +54,17 @@ $factory->define(App\Channel::class, function(Faker\Generator $faker){
     return [
         'name' => $name,
         'slug' => $name
+    ];
+});
+
+$factory->define(DatabaseNotification::class, function(\Faker\Generator $faker){
+    return [
+        'id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
+        'type' => 'App\Notifications\ThreadWasUpdated',
+        'notifiable_id' => function(){
+            return auth()->id() ?: factory(App\User::class)->create()->id;
+        },
+        'notifiable_type' => 'App\User',
+        'data' => ['foo' => 'bar']
     ];
 });

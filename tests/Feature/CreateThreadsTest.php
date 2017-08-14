@@ -54,7 +54,7 @@ class CreateThreadsTest extends TestCase
 
         $thread = create(Thread::class, ['user_id' => Auth::id()]);
 
-        $reply = create(Reply::class, ['thread_id' => $thread->id]); //TODO: it creates a new thread... cause factory, it shouldn't!
+        $reply = create(Reply::class, ['thread_id' => $thread->id]);
 
         $this->json('DELETE', $thread->path())
             ->assertStatus(204);
@@ -62,7 +62,7 @@ class CreateThreadsTest extends TestCase
         $this->assertDatabaseMissing('threads', ['id' => $thread->id])
             ->assertDatabaseMissing('replies', ['id' => $reply->id]);
 
-        $this->assertEquals(1, Activity::count());
+        $this->assertEquals(0, Activity::count());
     }
 
     /** @test */

@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Channel;
+use App\Notifications\ThreadWasUpdated;
 use App\Reply;
 use App\Thread;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -59,5 +62,66 @@ class ThreadTest extends TestCase
     public function a_thread_belongs_to_a_channel()
     {
         $this->assertInstanceOf(Channel::class, $this->thread->channel);
+    }
+
+    /** @test */
+    public function a_thread_can_be_subscribed_to()
+    {
+        $this->thread->subscribe($userId = 1);
+
+        $this->assertEquals(1, $this->thread->subscriptions()->where('user_id', $userId)->count());
+    }
+
+    /** @test */
+    public function a_thread_can_be_unsubscribe_from()
+    {
+
+        $this->thread->subscribe($userId = 1);
+        $this->thread->unsubscribe($userId);
+
+        $this->assertCount(0, $this->thread->subscriptions);
+    }
+
+    /** @test */
+    public function it_knows_if_authenticated_users_is_subscribed_to_it()
+    {
+
+        $this->signIn();
+
+        $this->assertFalse($this->thread->isSubscribed);
+
+        $this->thread->subscribe();
+
+        $this->assertTrue($this->thread->isSubscribed);
+    }
+
+    /** @test */
+    public function a_thread_notifies_all_subscribers_when_a_reply_is_added()
+    {
+        Notification::fake();
+
+        $this->signIn();
+
+        $this->thread
+            ->subscribe()
+            ->addReply([
+            'body' => 'foobar',
+            'user_id' => create(User::class)->id
+        ]);
+
+//        $this->assertDatabaseHas('notifications', ['notifiable_id' => auth()->id()]);
+        Notification::assertSentTo(auth()->user(), ThreadWasUpdated::class);
+    }
+
+    /** @test */
+    public function a_thread_can_check_if_authenticated_user_has_read_all_replies()
+    {
+        $this->signIn();
+
+        $this->assertTrue($this->thread->hasUpdatesFor());
+
+        $this->thread->readByUser();
+
+        $this->assertFalse($this->thread->hasUpdatesFor());
     }
 }

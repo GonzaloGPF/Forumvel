@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Notifications\ThreadWasUpdated;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +17,8 @@ class Thread extends Model
     ];
 
     protected $with = ['creator', 'channel'];
+
+    protected $appends = ['isSubscribed'];
 
     protected static function boot()
     {
@@ -74,6 +78,14 @@ class Thread extends Model
         return $this->replies()->create($reply);
     }
 
+    public function notifyUsers($reply)
+    {
+        $this->subscriptions()
+            ->where('user_id', '!=', $reply->user_id)
+            ->get()
+            ->each->notify($reply);
+    }
+
     /**
      * @param Builder $query
      * @param $filters
@@ -82,5 +94,46 @@ class Thread extends Model
     public function scopeFilter(Builder $query, $filters)
     {
         return $filters->apply($query);
+    }
+
+    public function subscribe($userId = null)
+    {
+        $this->subscriptions()->create([
+            'user_id' => $userId ?: auth()->id()
+        ]);
+        return $this;
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(ThreadSubscription::class);
+    }
+
+    public function unsubscribe($userId = null)
+    {
+        $this->subscriptions()
+            ->where('user_id', $userId ?: auth()->id())
+            ->delete();
+    }
+
+    public function getIsSubscribedAttribute()
+    {
+        return $this->subscriptions()
+            ->where('user_id', auth()->id())
+            ->exists();
+    }
+
+    public function hasUpdatesFor(User $user = null)
+    {
+        $user = $user ?: \auth()->user();
+        $key = $user->visitedThreadCacheKey($this);
+
+        return $this->updated_at > cache($key);
+    }
+
+    public function readByUser(User $user = null)
+    {
+        $user = $user ?: \auth()->user();
+        cache()->forever($user->visitedThreadCacheKey($this), Carbon::now());
     }
 }
