@@ -44,8 +44,8 @@ if (token) {
 // window.events will be a event bus using a vue instance <3
 window.events = new Vue();
 
-window.flash = (message) => {
-    window.events.$emit('flash', message);
+window.flash = (message, level = 'success') => {
+    window.events.$emit('flash', {message, level});
 };
 
 window.App = {
