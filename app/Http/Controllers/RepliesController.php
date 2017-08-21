@@ -8,6 +8,8 @@ use App\Thread;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Symfony\Component\HttpFoundation\Response;
 
 class RepliesController extends Controller
 {
@@ -27,6 +29,10 @@ class RepliesController extends Controller
 
     public function store($channelId, Thread $thread)
     {
+
+        if(Gate::denies('create', new Reply)){
+            return response('Your are postin too frequently, please take a break :)', Response::HTTP_TOO_MANY_REQUESTS);
+        };
         try{
             $this->validate(request(), ['body' => 'required|spamfree']);
 
@@ -35,7 +41,7 @@ class RepliesController extends Controller
                 'body' => request('body')
             ]);
         } catch (Exception $e) {
-            return response('Sorry, your Reply could not be saved at this time', 422);
+            return response('Sorry, your Reply could not be saved at this time', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $reply->load('owner');
@@ -43,8 +49,8 @@ class RepliesController extends Controller
 
     public function update(Reply $reply)
     {
+        $this->authorize('update', $reply);
         try {
-            $this->authorize('update', $reply);
 
             $this->validate(request(), ['body' => 'required|spamfree']);
 

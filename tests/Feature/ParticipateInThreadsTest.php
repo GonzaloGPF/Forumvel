@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Reply;
 use App\Thread;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -59,7 +60,7 @@ class ParticipateInThreadsTest extends TestCase
 
         $this->signIn()
             ->delete("/replies/{$reply->id}")
-            ->assertStatus(403);
+            ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     /** @test */
@@ -87,7 +88,7 @@ class ParticipateInThreadsTest extends TestCase
 
         $this->signIn()
             ->patch("/replies/{$reply->id}")
-            ->assertStatus(403);
+            ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     /** @test */
@@ -114,8 +115,23 @@ class ParticipateInThreadsTest extends TestCase
             'body' => 'Yahoo customer support'
         ]);
 
-        $this->expectException(\Exception::class);
+        $this->post($thread->path() . '/replies', $reply->toArray())
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
 
-        $this->post($thread->path() . '/replies', $reply->toArray());
+    /** @test */
+    public function users_may_only_reply_maximum_once_per_minute()
+    {
+        $this->signIn();
+
+        $thread = create(Thread::class);
+
+        $reply = make(Reply::class);
+
+        $this->post($thread->path() . '/replies', $reply->toArray())
+            ->assertStatus(Response::HTTP_OK);
+
+        $this->post($thread->path() . '/replies', $reply->toArray())
+            ->assertStatus(Response::HTTP_TOO_MANY_REQUESTS);
     }
 }
