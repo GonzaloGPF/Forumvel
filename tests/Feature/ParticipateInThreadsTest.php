@@ -107,7 +107,7 @@ class ParticipateInThreadsTest extends TestCase
     /** @test */
     public function replies_that_contain_spam_may_not_be_created()
     {
-        $this->signIn();
+        $this->signIn()->withExceptionHandling();
 
         $thread = create(Thread::class);
 
@@ -115,14 +115,14 @@ class ParticipateInThreadsTest extends TestCase
             'body' => 'Yahoo customer support'
         ]);
 
-        $this->post($thread->path() . '/replies', $reply->toArray())
+        $this->json('post', $thread->path() . '/replies', $reply->toArray())
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /** @test */
     public function users_may_only_reply_maximum_once_per_minute()
     {
-        $this->signIn();
+        $this->signIn()->withExceptionHandling();
 
         $thread = create(Thread::class);
 

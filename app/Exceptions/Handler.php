@@ -5,6 +5,8 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class Handler extends ExceptionHandler
 {
@@ -44,6 +46,17 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if($exception instanceof ValidationException){
+            if($request->wantsJson()){
+                return response('Sorry, validation fails', Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        }
+
+        if($exception instanceof ThrottleAuthorization){
+            // if($request->wantsJson()) ...
+            return response('You are posting too frequently', Response::HTTP_TOO_MANY_REQUESTS);
+        }
+
         return parent::render($request, $exception);
     }
 

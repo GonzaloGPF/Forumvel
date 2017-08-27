@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreatePostForm;
 use App\Inspections\Spam;
+use App\Notifications\YouWhereMentioned;
 use App\Reply;
 use App\Thread;
+use App\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,37 +30,18 @@ class RepliesController extends Controller
         return $thread->replies()->paginate(20);
     }
 
-    public function store($channelId, Thread $thread)
+    public function store($channelId, Thread $thread, CreatePostForm $form)
     {
-
-        if(Gate::denies('create', new Reply)){
-            return response('Your are postin too frequently, please take a break :)', Response::HTTP_TOO_MANY_REQUESTS);
-        };
-        try{
-            $this->validate(request(), ['body' => 'required|spamfree']);
-
-            $reply = $thread->addReply([
-                'user_id' => Auth::id(),
-                'body' => request('body')
-            ]);
-        } catch (Exception $e) {
-            return response('Sorry, your Reply could not be saved at this time', Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        return $reply->load('owner');
+        return $form->persist($thread);
     }
 
     public function update(Reply $reply)
     {
         $this->authorize('update', $reply);
-        try {
 
-            $this->validate(request(), ['body' => 'required|spamfree']);
+        $this->validate(request(), ['body' => 'required|spamfree']);
 
-            $reply->update(request()->all());
-        } catch (Exception $e) {
-            return response('Sorry, your Reply could not be saved at this time', 422);
-        }
+        $reply->update(request()->all());
     }
 
     public function destroy(Reply $reply)
