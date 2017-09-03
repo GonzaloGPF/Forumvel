@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
         'activities',
         'favorites',
         'password_resets'
-
     ];
     /**
      * Run the database seeds.

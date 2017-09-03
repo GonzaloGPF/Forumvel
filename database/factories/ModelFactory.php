@@ -33,7 +33,9 @@ $factory->define(App\Thread::class, function(Faker\Generator $faker){
        'user_id' => function(){
             return factory(App\User::class)->create()->id;
        },
-       'channel_id' => factory(\App\Channel::class)->create()->id
+       'channel_id' => factory(\App\Channel::class)->create()->id,
+       'replies_count' => 0,
+       'visits_count' => 0,
    ];
 });
 

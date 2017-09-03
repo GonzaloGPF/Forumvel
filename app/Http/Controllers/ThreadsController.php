@@ -6,8 +6,7 @@ use App\Channel;
 use App\Filters\ThreadsFilter;
 use App\Inspections\Spam;
 use App\Thread;
-use App\User;
-use Carbon\Carbon;
+use App\Trending;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,10 +22,11 @@ class ThreadsController extends Controller
      *
      * @param Channel $channel
      * @param ThreadsFilter $filters
+     * @param Trending $trending
      * @return \Illuminate\Http\Response
      * @internal param ThreadsFilter $filter
      */
-    public function index(Channel $channel, ThreadsFilter $filters)
+    public function index(Channel $channel, ThreadsFilter $filters, Trending $trending)
     {
         $threads = $this->getThreads($channel, $filters);
 
@@ -34,7 +34,10 @@ class ThreadsController extends Controller
             return $threads;
         }
 
-        return view('threads.index', compact('threads'));
+        return view('threads.index', [
+            'threads' => $threads,
+            'trending' => $trending->get()
+        ]);
     }
 
     /**
@@ -78,13 +81,18 @@ class ThreadsController extends Controller
      *
      * @param $channel
      * @param  \App\Thread $thread
+     * @param Trending $trending
      * @return \Illuminate\Http\Response
      */
-    public function show($channel, Thread $thread)
+    public function show($channel, Thread $thread, Trending $trending)
     {
         if(auth()->check()){
             auth()->user()->read($thread);
         }
+
+        $trending->push($thread);
+
+        $thread->increment('visits_count');
 
         return view('threads.show', compact('thread'));
     }
@@ -144,6 +152,6 @@ class ThreadsController extends Controller
             $threads->where('channel_id', $channel->id);
         }
 
-        return $threads->get();
+        return $threads->paginate(15);
     }
 }
