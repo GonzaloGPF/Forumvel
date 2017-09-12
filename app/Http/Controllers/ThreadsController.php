@@ -15,6 +15,7 @@ class ThreadsController extends Controller
     function __construct()
     {
         $this->middleware('auth')->except(['index', 'show']);
+        $this->middleware('email-confirmed')->except(['index', 'show']);
     }
 
     /**
