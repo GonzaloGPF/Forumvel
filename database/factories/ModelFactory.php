@@ -34,8 +34,10 @@ $factory->state(App\User::class, 'unconfirmed', function() {
 });
 
 $factory->define(App\Thread::class, function(Faker\Generator $faker){
+    $title = $faker->sentence;
    return [
-       'title' => $faker->sentence,
+       'title' => $title,
+       'slug' => str_slug($title),
        'body' => $faker->paragraph,
        'user_id' => function(){
             return factory(App\User::class)->create()->id;

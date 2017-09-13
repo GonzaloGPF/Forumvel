@@ -54,11 +54,9 @@ class ThreadsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param Spam $spam
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
         $this->validate(request(), [
             'title' => 'required|spamfree',
@@ -68,9 +66,10 @@ class ThreadsController extends Controller
 
         $thread = Thread::create([
             'user_id' => Auth::id(),
-            'channel_id' => $request->get('channel_id'),
-            'title' => $request->get('title'),
-            'body' => $request->get('body')
+            'channel_id' => request('channel_id'),
+            'title' => request('title'),
+            'body' => request('body'),
+            'slug' => request('title')
         ]);
 
         return redirect($thread->path())

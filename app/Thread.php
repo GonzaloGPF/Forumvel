@@ -12,7 +12,7 @@ class Thread extends Model
     use RecordsActivity;
 
     protected $fillable = [
-        'title', 'body' , 'user_id', 'channel_id'
+        'slug', 'title', 'body' , 'user_id', 'channel_id'
     ];
 
     protected $with = ['creator', 'channel'];
@@ -33,6 +33,11 @@ class Thread extends Model
         });
     }
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     /**
      * @param null $extra
      * @return string
@@ -40,7 +45,7 @@ class Thread extends Model
     public function path($extra = null)
     {
         $extra = $extra == null ? '' : '/' . $extra;
-        return "/threads/{$this->channel->slug}/{$this->id}" . $extra;
+        return "/threads/{$this->channel->slug}/{$this->slug}" . $extra;
     }
 
     /**
@@ -136,5 +141,29 @@ class Thread extends Model
     {
         $user = $user ?: \auth()->user();
         cache()->forever($user->visitedThreadCacheKey($this), Carbon::now());
+    }
+
+    public function setSlugAttribute($title)
+    {
+        $slug = str_slug($title);
+
+        if(static::whereSlug($slug)->exists()){
+            $slug = $this->incrementSlug($slug);
+        }
+
+        $this->attributes['slug'] = $slug;
+    }
+
+    public function incrementSlug($slug)
+    {
+        $lastSlug = static::whereTitle($this->title)->latest('id')->value('slug');
+
+        // php7 stuff, strings as arrays :D get the last character of $lastSlug (if 'test-thread-3' it returns '3')
+        if(is_numeric($lastSlug[-1])) {
+            return preg_replace_callback('/(\d+)$/', function($matches) {
+                return $matches[1] + 1;
+            }, $lastSlug);
+        }
+        return "{$slug}-2";
     }
 }
