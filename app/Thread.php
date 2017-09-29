@@ -12,7 +12,7 @@ class Thread extends Model
     use RecordsActivity;
 
     protected $fillable = [
-        'slug', 'title', 'body' , 'user_id', 'channel_id'
+        'slug', 'title', 'body' , 'user_id', 'channel_id', 'best_reply_id'
     ];
 
     protected $with = ['creator', 'channel'];
@@ -27,6 +27,10 @@ class Thread extends Model
 //        static::addGlobalScope('repliesCount', function(Builder $builder){
 //            $builder->withCount('replies'); // will add a new attribute to every Thread called 'replies_count'
 //        });
+
+        static::created(function(Thread $thread){
+            $thread->update(['slug' => $thread->title]);
+        });
 
         static::deleting(function(Thread $thread){
             $thread->replies->each->delete();
@@ -147,23 +151,15 @@ class Thread extends Model
     {
         $slug = str_slug($title);
 
-        if(static::whereSlug($slug)->exists()){
-            $slug = $this->incrementSlug($slug);
+        if(static::whereSlug($slug)->exists()) {
+            $slug = "{$slug}-" . $this->id;
         }
 
         $this->attributes['slug'] = $slug;
     }
 
-    public function incrementSlug($slug)
+    public function markBestReply(Reply $reply)
     {
-        $lastSlug = static::whereTitle($this->title)->latest('id')->value('slug');
-
-        // php7 stuff, strings as arrays :D get the last character of $lastSlug (if 'test-thread-3' it returns '3')
-        if(is_numeric($lastSlug[-1])) {
-            return preg_replace_callback('/(\d+)$/', function($matches) {
-                return $matches[1] + 1;
-            }, $lastSlug);
-        }
-        return "{$slug}-2";
+        $this->update(['best_reply_id' => $reply->id]);
     }
 }

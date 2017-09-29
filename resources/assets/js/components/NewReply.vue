@@ -46,12 +46,6 @@
             })
         },
 
-        computed: {
-            isLogged(){
-                return window.App.signedIn;
-            }
-        },
-
         methods:{
             addReply(){
                 axios.post(location.pathname + '/replies', {

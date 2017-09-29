@@ -1,5 +1,5 @@
 <template>
-    <div :id="'reply-'+reply.id" class="panel panel-default">
+    <div :id="'reply-'+reply.id" class="panel" :class="isBest ? 'panel-success' : 'panel-default'">
         <div class="panel-heading">
             <div class="level">
                 <h5 class="flex">
@@ -29,9 +29,14 @@
 
         <!--@can('update', $reply)-->
         <!--<div class="panel-footer level">-->
-        <div class="panel-footer level" v-if="canUpdate">
-            <button class="btn-btn-xs mr-1" @click="editing = true">Edit</button>
-            <button class="btn btn-xs btn-danger mr-1" @click="destroy">Delete</button>
+        <div class="panel-footer level">
+            <div v-if="authorize('updateReply', reply)">
+                <button class="btn-btn-xs mr-1" @click="editing = true">Edit</button>
+                <button class="btn btn-xs btn-danger mr-1" @click="destroy">Delete</button>
+            </div>
+            <div>
+                <button class="btn btn-xs btn-default ml-a" @click="markAsBest" v-show="!isBest">Best Reply</button>
+            </div>
         </div>
         <!--</div>-->
         <!--@endcan-->
@@ -51,20 +56,21 @@
             return {
                 editing: false,
                 body: this.data.body,
-                reply: this.data
+                reply: this.data,
+                isBest: this.data.isBest
             }
         },
 
         computed: {
-            canUpdate(){
-                return this.authorize( user => this.data.user_id === user.id)
-            },
-            isLogged(){
-                return window.App.signedIn;
-            },
             ago(){
                 return moment(this.reply.created_at).fromNow();
             }
+        },
+
+        created(){
+            window.events.$on('best-reply-selected', (id) => {
+                this.isBest = id === this.reply.id;
+            })
         },
 
         methods: {
@@ -84,6 +90,12 @@
                 axios.delete('/replies/' + this.reply.id);
 
                 this.$emit('deleted', this.reply.id);
+            },
+
+            markAsBest(){
+                axios.post(`/replies/${this.reply.id}/best`);
+
+                window.events.$emit('best-reply-selected', this.reply.id);
             }
         }
     }

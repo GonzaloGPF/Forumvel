@@ -26737,11 +26737,25 @@ Vue.component('avatar-form', __webpack_require__(167));
 
 Vue.component('thread-view', __webpack_require__(173));
 
+var authorizations = __webpack_require__(203);
+
 Vue.mixin({
     methods: {
-        authorize: function authorize(handler) {
-            var user = window.App.user;
-            return user ? handler(user) : false;
+        authorize: function authorize() {
+            if (!window.App.user) return false;
+
+            for (var _len = arguments.length, params = Array(_len), _key = 0; _key < _len; _key++) {
+                params[_key] = arguments[_key];
+            }
+
+            if (typeof params[0] === 'string') {
+                return authorizations[params[0]](params[1]);
+            }
+
+            return params[0](window.App.user);
+        },
+        isLogged: function isLogged() {
+            return window.App.signedIn;
         }
     }
 });
@@ -58780,6 +58794,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 
@@ -58794,26 +58813,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         return {
             editing: false,
             body: this.data.body,
-            reply: this.data
+            reply: this.data,
+            isBest: this.data.isBest
         };
     },
 
 
     computed: {
-        canUpdate: function canUpdate() {
-            var _this = this;
-
-            return this.authorize(function (user) {
-                return _this.data.user_id === user.id;
-            });
-        },
-        isLogged: function isLogged() {
-            return window.App.signedIn;
-        },
         ago: function ago() {
             return __WEBPACK_IMPORTED_MODULE_1_moment___default()(this.reply.created_at).fromNow();
         }
     },
+
+    created: function created() {
+        var _this = this;
+
+        window.events.$on('best-reply-selected', function (id) {
+            _this.isBest = id === _this.reply.id;
+        });
+    },
+
 
     methods: {
         update: function update() {
@@ -58831,6 +58850,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             axios.delete('/replies/' + this.reply.id);
 
             this.$emit('deleted', this.reply.id);
+        },
+        markAsBest: function markAsBest() {
+            axios.post('/replies/' + this.reply.id + '/best');
+
+            window.events.$emit('best-reply-selected', this.reply.id);
         }
     }
 });
@@ -59209,7 +59233,8 @@ webpackContext.id = 182;
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
-    staticClass: "panel panel-default",
+    staticClass: "panel",
+    class: _vm.isBest ? 'panel-success' : 'panel-default',
     attrs: {
       "id": 'reply-' + _vm.reply.id
     }
@@ -59281,9 +59306,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "innerHTML": _vm._s(_vm.body)
     }
-  })]), _vm._v(" "), (_vm.canUpdate) ? _c('div', {
+  })]), _vm._v(" "), _c('div', {
     staticClass: "panel-footer level"
-  }, [_c('button', {
+  }, [(_vm.authorize('updateReply', _vm.reply)) ? _c('div', [_c('button', {
     staticClass: "btn-btn-xs mr-1",
     on: {
       "click": function($event) {
@@ -59295,7 +59320,18 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "click": _vm.destroy
     }
-  }, [_vm._v("Delete")])]) : _vm._e()])
+  }, [_vm._v("Delete")])]) : _vm._e(), _vm._v(" "), _c('div', [_c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.isBest),
+      expression: "!isBest"
+    }],
+    staticClass: "btn btn-xs btn-default ml-a",
+    on: {
+      "click": _vm.markAsBest
+    }
+  }, [_vm._v("Best Reply")])])])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -59401,12 +59437,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         });
     },
 
-
-    computed: {
-        isLogged: function isLogged() {
-            return window.App.signedIn;
-        }
-    },
 
     methods: {
         addReply: function addReply() {
@@ -61296,6 +61326,26 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 195 */,
+/* 196 */,
+/* 197 */,
+/* 198 */,
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */
+/***/ (function(module, exports) {
+
+var user = window.App.user;
+
+module.exports = {
+    updateReply: function updateReply(reply) {
+        return reply.user_id === user.id;
+    }
+};
 
 /***/ })
 /******/ ]);

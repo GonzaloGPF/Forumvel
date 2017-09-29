@@ -8,6 +8,7 @@ use App\Inspections\Spam;
 use App\Thread;
 use App\Trending;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class ThreadsController extends Controller
@@ -69,8 +70,11 @@ class ThreadsController extends Controller
             'channel_id' => request('channel_id'),
             'title' => request('title'),
             'body' => request('body'),
-            'slug' => request('title')
         ]);
+
+        if(request()->wantsJson()){
+            return response($thread, Response::HTTP_CREATED);
+        }
 
         return redirect($thread->path())
             ->with('flash', 'Your thread has been created');

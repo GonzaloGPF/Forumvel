@@ -20,12 +20,24 @@ Vue.component('avatar-form', require('./components/AvatarForm.vue'));
 
 Vue.component('thread-view', require('./pages/Thread.vue'));
 
+
+let authorizations = require('./authorizations');
+
 Vue.mixin({
     methods: {
-        authorize(handler){
-            let user = window.App.user;
-            return user ? handler(user) : false;
+        authorize(...params){
+            if (! window.App.user) return false;
+
+            if (typeof params[0] === 'string') {
+                return authorizations[params[0]](params[1]);
+            }
+
+            return params[0](window.App.user);
         },
+
+        isLogged() {
+            return window.App.signedIn;
+        }
     }
 });
 
