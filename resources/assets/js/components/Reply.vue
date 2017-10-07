@@ -29,13 +29,13 @@
 
         <!--@can('update', $reply)-->
         <!--<div class="panel-footer level">-->
-        <div class="panel-footer level">
-            <div v-if="authorize('updateReply', reply)">
+        <div class="panel-footer level" v-if="authorize('owns', reply) || authorize('owns', reply.thread)">
+            <div>
                 <button class="btn-btn-xs mr-1" @click="editing = true">Edit</button>
                 <button class="btn btn-xs btn-danger mr-1" @click="destroy">Delete</button>
             </div>
             <div>
-                <button class="btn btn-xs btn-default ml-a" @click="markAsBest" v-show="!isBest">Best Reply</button>
+                <button class="btn btn-xs btn-default ml-a" @click="markAsBest" v-show="authorize('owns', reply.thread)">Best Reply</button>
             </div>
         </div>
         <!--</div>-->

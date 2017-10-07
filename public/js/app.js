@@ -26708,7 +26708,7 @@ return zhTw;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(128);
-module.exports = __webpack_require__(194);
+module.exports = __webpack_require__(195);
 
 
 /***/ }),
@@ -26737,7 +26737,7 @@ Vue.component('avatar-form', __webpack_require__(167));
 
 Vue.component('thread-view', __webpack_require__(173));
 
-var authorizations = __webpack_require__(203);
+var authorizations = __webpack_require__(194);
 
 Vue.mixin({
     methods: {
@@ -59306,9 +59306,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "innerHTML": _vm._s(_vm.body)
     }
-  })]), _vm._v(" "), _c('div', {
+  })]), _vm._v(" "), (_vm.authorize('owns', _vm.reply) || _vm.authorize('owns', _vm.reply.thread)) ? _c('div', {
     staticClass: "panel-footer level"
-  }, [(_vm.authorize('updateReply', _vm.reply)) ? _c('div', [_c('button', {
+  }, [_c('div', [_c('button', {
     staticClass: "btn-btn-xs mr-1",
     on: {
       "click": function($event) {
@@ -59320,18 +59320,18 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "click": _vm.destroy
     }
-  }, [_vm._v("Delete")])]) : _vm._e(), _vm._v(" "), _c('div', [_c('button', {
+  }, [_vm._v("Delete")])]), _vm._v(" "), _c('div', [_c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: (!_vm.isBest),
-      expression: "!isBest"
+      value: (_vm.authorize('owns', _vm.reply.thread)),
+      expression: "authorize('owns', reply.thread)"
     }],
     staticClass: "btn btn-xs btn-default ml-a",
     on: {
       "click": _vm.markAsBest
     }
-  }, [_vm._v("Best Reply")])])])])
+  }, [_vm._v("Best Reply")])])]) : _vm._e()])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -61325,27 +61325,21 @@ if (false) {
 /* 194 */
 /***/ (function(module, exports) {
 
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 195 */,
-/* 196 */,
-/* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */,
-/* 201 */,
-/* 202 */,
-/* 203 */
-/***/ (function(module, exports) {
-
 var user = window.App.user;
 
 module.exports = {
-    updateReply: function updateReply(reply) {
-        return reply.user_id === user.id;
+    owns: function owns(model) {
+        var prop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'user_id';
+
+        return model[prop] === user.id;
     }
 };
+
+/***/ }),
+/* 195 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);

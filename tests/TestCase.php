@@ -6,6 +6,7 @@ use App\Exceptions\Handler;
 use App\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Schema;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -14,6 +15,7 @@ abstract class TestCase extends BaseTestCase
     protected function setUp()
     {
         parent::setUp();
+        Schema::enableForeignKeyConstraints();
         $this->disableExceptionHandling();
     }
 
