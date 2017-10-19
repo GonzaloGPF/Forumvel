@@ -12,7 +12,11 @@ class Thread extends Model
     use RecordsActivity;
 
     protected $fillable = [
-        'slug', 'title', 'body' , 'user_id', 'channel_id', 'best_reply_id'
+        'slug', 'title', 'body' , 'user_id', 'channel_id', 'best_reply_id', 'closed'
+    ];
+
+    protected $casts = [
+        'closed' => 'boolean'
     ];
 
     protected $with = ['creator', 'channel'];

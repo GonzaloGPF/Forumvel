@@ -58591,14 +58591,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['initialRepliesCount'],
+    props: ['thread'],
 
     components: { Replies: __WEBPACK_IMPORTED_MODULE_0__components_Replies_vue___default.a, SubscribeButton: __WEBPACK_IMPORTED_MODULE_1__components_SubscribeButton_vue___default.a },
 
     data: function data() {
         return {
-            repliesCount: this.initialRepliesCount
+            repliesCount: this.thread.replies_count,
+            closed: this.thread.closed
         };
+    },
+
+
+    methods: {
+        toggleClose: function toggleClose() {
+            this.closed = !this.closed;
+
+            axios[this.closed ? 'delete' : 'post']('/closed-threads/' + this.thread.slug);
+        }
     }
 });
 
@@ -58653,6 +58663,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__NewReply_vue__ = __webpack_require__(184);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__NewReply_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__NewReply_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mixins_collection__ = __webpack_require__(189);
+//
+//
+//
+//
 //
 //
 //
@@ -61218,7 +61232,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "updated": _vm.fetch
     }
-  }), _vm._v(" "), _c('new-reply', {
+  }), _vm._v(" "), (_vm.$parent.closed) ? _c('p', [_vm._v("\n        This thread has been closed, no more replies are allowed\n    ")]) : _c('new-reply', {
     on: {
       "created": _vm.add
     }
@@ -61332,6 +61346,9 @@ module.exports = {
         var prop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'user_id';
 
         return model[prop] === user.id;
+    },
+    isAdmin: function isAdmin() {
+        return ['Zalo'].includes(user.name);
     }
 };
 

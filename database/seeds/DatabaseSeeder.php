@@ -1,21 +1,10 @@
 <?php
 
-use App\Reply;
-use App\Thread;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
-    private $tables = [
-        'threads',
-        'replies',
-        'channels',
-        'users',
-        'activities',
-        'favorites',
-        'password_resets'
-    ];
     /**
      * Run the database seeds.
      *
@@ -23,18 +12,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        if (App::environment() === 'production') exit();
+
         $this->cleanDataBase();
 
-        factory(Thread::class, 10)->create()->each(function($thread){
-            factory(Reply::class, rand(1,5))->create([
-                'thread_id' => $thread->id
-            ]);
-        });
+        $this->call(ThreadsTableSeeder::class);
 
-        $user = \App\User::find(1);
-        $user->email = 'mail@mail.com';
-        $user->save();
-
+        factory(\App\User::class)->states('test')->create();
     }
 
     public function cleanDataBase()
@@ -42,10 +26,14 @@ class DatabaseSeeder extends Seeder
         //disable foreign key check for this connection before truncating tables
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        foreach ($this->tables as $tableName){
-            DB::table($tableName)->truncate();
-        }
+        $database = DB::select('SELECT DATABASE() AS name');
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        $col = 'Tables_in_' . $database[0]->name;
+
+        $tables = array_except(DB::select('SHOW TABLES'), ['migrations']);
+
+        foreach ($tables as $table) {
+            DB::table($table->$col)->truncate();
+        }
     }
 }

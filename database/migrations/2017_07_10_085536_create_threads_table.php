@@ -23,6 +23,7 @@ class CreateThreadsTable extends Migration
             $table->string('slug')->unique()->nullable();
             $table->string('title');
             $table->text('body');
+            $table->boolean('closed')->default(false);
             $table->timestamps();
 
             $table->foreign('best_reply_id')

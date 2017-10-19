@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use App\Channel;
 use App\Notifications\ThreadWasUpdated;
@@ -75,7 +75,6 @@ class ThreadTest extends TestCase
     /** @test */
     public function a_thread_can_be_unsubscribe_from()
     {
-
         $this->thread->subscribe($userId = 1);
         $this->thread->unsubscribe($userId);
 
@@ -85,7 +84,6 @@ class ThreadTest extends TestCase
     /** @test */
     public function it_knows_if_authenticated_users_is_subscribed_to_it()
     {
-
         $this->signIn();
 
         $this->assertFalse($this->thread->isSubscribed);

@@ -52,6 +52,11 @@ class User extends Authenticatable
         return $this->hasMany(Activity::class);
     }
 
+    public function isAdmin()
+    {
+        return in_array($this->name, ['Zalo']);
+    }
+
     public function confirm()
     {
         $this->update([
@@ -67,7 +72,10 @@ class User extends Authenticatable
 
     public function read(Thread $thread)
     {
-        cache()->forever($this->visitedThreadCacheKey($thread), Carbon::now());
+        cache()->forever(
+            $this->visitedThreadCacheKey($thread),
+            Carbon::now()
+        );
     }
 
     public function lastReply()

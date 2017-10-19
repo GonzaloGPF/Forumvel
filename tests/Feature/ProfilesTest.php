@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Thread;
 use App\User;
-use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -26,7 +25,7 @@ class ProfilesTest extends TestCase
     {
         $this->signIn();
 
-        $user = Auth::user();
+        $user = auth()->user();
 
         $thread = create(Thread::class, ['user_id' => $user->id]);
 

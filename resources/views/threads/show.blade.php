@@ -4,7 +4,7 @@
     <link href="{{ asset('vendor/jquery.atwho.css') }}" rel="stylesheet">
 @endsection
 @section('content')
-    <thread-view :initial-replies-count="{{ $thread->replies_count }}" inline-template>
+    <thread-view :thread="{{ $thread }}" inline-template>
         <div class="container">
             <div class="row">
                 <div class="col-md-8">
@@ -28,7 +28,6 @@
                                     </form>
                                 @endcan
                             </div>
-
                         </div>
 
                         <div class="panel-body">
@@ -49,8 +48,12 @@
                                 by <a href="">{{ $thread->creator->name }}</a>
                                 and currently has <span v-text="repliesCount"></span> {{ str_plural('comment', $thread->replies_count) }}.
                             </p>
-                            <p>
+                            <p v-if="isLogged()">
                                 <subscribe-button :active="{{ json_encode($thread->isSubscribed) }}"></subscribe-button>
+                                <button class="btn btn-default"
+                                        v-if="authorize('isAdmin')"
+                                        @click="toggleClose()"
+                                        v-text="closed ? 'Open' : 'Close'"></button>
                             </p>
                         </div>
                     </div>

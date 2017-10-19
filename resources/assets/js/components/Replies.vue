@@ -6,7 +6,11 @@
 
         <paginator :dataSet="dataSet" @updated="fetch"></paginator>
 
-        <new-reply @created="add"></new-reply>
+        <p v-if="$parent.closed">
+            This thread has been closed, no more replies are allowed
+        </p>
+
+        <new-reply @created="add" v-else></new-reply>
     </div>
 </template>
 <script>

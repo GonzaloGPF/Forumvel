@@ -32,6 +32,9 @@ class RepliesController extends Controller
 
     public function store($channelId, Thread $thread, CreatePostForm $form)
     {
+        if ($thread->closed) {
+            return response('Thread is closed', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
         return $form->persist($thread);
     }
 

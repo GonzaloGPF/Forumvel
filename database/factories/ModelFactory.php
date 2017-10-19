@@ -33,6 +33,20 @@ $factory->state(App\User::class, 'unconfirmed', function() {
     ];
 });
 
+$factory->state(\App\User::class, 'admin', function() {
+    return [
+        'name' => 'Zalo'
+    ];
+});
+
+$factory->state(\App\User::class, 'test', function() {
+    return [
+        'name' => 'Zalo',
+        'confirmed' => true,
+        'email' => 'mail@mail.com'
+    ];
+});
+
 $factory->define(App\Thread::class, function(Faker\Generator $faker){
     $title = $faker->sentence;
    return [
@@ -45,6 +59,7 @@ $factory->define(App\Thread::class, function(Faker\Generator $faker){
        'channel_id' => factory(\App\Channel::class)->create()->id,
        'replies_count' => 0,
        'visits_count' => 0,
+       'closed' => false
    ];
 });
 
