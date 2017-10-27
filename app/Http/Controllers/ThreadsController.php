@@ -4,19 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Channel;
 use App\Filters\ThreadsFilter;
-use App\Inspections\Spam;
+use App\Rules\Recaptcha;
 use App\Thread;
 use App\Trending;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 
 class ThreadsController extends Controller
 {
     function __construct()
     {
-        $this->middleware('auth')->except(['index', 'show']);
-        $this->middleware('email-confirmed')->except(['index', 'show']);
+//        $this->middleware('auth')->except(['index', 'show']);
+//        $this->middleware('email-confirmed')->except(['index', 'show']);
     }
 
     /**
@@ -55,18 +53,20 @@ class ThreadsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @param Recaptcha $recaptcha
+     * @return Response
      */
-    public function store()
+    public function store(Recaptcha $recaptcha)
     {
         $this->validate(request(), [
             'title' => 'required|spamfree',
             'body' => 'required|spamfree',
-            'channel_id' => 'required|exists:channels,id'
+            'channel_id' => 'required|exists:channels,id',
+//            'g-recaptcha-response' => ['required', $recaptcha]
         ]);
 
         $thread = Thread::create([
-            'user_id' => Auth::id(),
+            'user_id' => auth()->id(),
             'channel_id' => request('channel_id'),
             'title' => request('title'),
             'body' => request('body'),
