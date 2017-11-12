@@ -9,6 +9,7 @@ use App\Rules\Recaptcha;
 use App\Thread;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -23,11 +24,11 @@ class CreateThreadsTest extends TestCase
     {
         parent::setUp();
 
-        $mock = \Mockery::mock(Recaptcha::class);
-
-        $mock->shouldReceive('passes')->andReturn(true);
-
-        app()->singleton(Recaptcha::class, $mock);
+        app()->singleton(Recaptcha::class, function () {
+            return \Mockery::mock(Recaptcha::class, function ($mock) {
+                $mock->shouldReceive('passes')->andReturn(true);
+            });
+        });
     }
 
     /** @test */
@@ -76,7 +77,7 @@ class CreateThreadsTest extends TestCase
 
         $this->assertEquals(0, Activity::count());
     }
-    
+
     /** @test */
     public function new_users_must_first_confirm_their_email_address_before_creating_threads()
     {
@@ -103,8 +104,6 @@ class CreateThreadsTest extends TestCase
     /** @test */
     function a_thread_requires_a_title()
     {
-        $response = $this->publishThread(['title' => null]);
-        dd($response->json());
         $this->publishThread(['title' => null])
             ->assertSessionHasErrors('title');
     }
@@ -127,11 +126,11 @@ class CreateThreadsTest extends TestCase
         $this->publishThread(['channel_id' => 4])
             ->assertSessionHasErrors('channel_id');
     }
-    
+
     /** @test */
     public function a_thread_requires_recaptcha_verification()
     {
-        unset(app()[Recaptcha::class]);
+        unset(app()[Recaptcha::class]); // To remove the Mock
 
         $this->publishThread(['g-recaptcha-response' => 'test'])
             ->assertSessionHasErrors('g-recaptcha-response');
@@ -150,7 +149,7 @@ class CreateThreadsTest extends TestCase
 
         $this->assertEquals("test-thread-{$thread['id']}", $thread['slug']);
     }
-    
+
     /** @test */
     public function a_thread_with_a_title_that_ends_in_a_number_should_generate_proper_slug()
     {

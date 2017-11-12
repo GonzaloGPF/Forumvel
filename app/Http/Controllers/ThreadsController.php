@@ -7,14 +7,15 @@ use App\Filters\ThreadsFilter;
 use App\Rules\Recaptcha;
 use App\Thread;
 use App\Trending;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class ThreadsController extends Controller
 {
     function __construct()
     {
-//        $this->middleware('auth')->except(['index', 'show']);
-//        $this->middleware('email-confirmed')->except(['index', 'show']);
+        $this->middleware('auth')->except(['index', 'show']);
+        $this->middleware('email-confirmed')->except(['index', 'show']);
     }
 
     /**
@@ -58,11 +59,11 @@ class ThreadsController extends Controller
      */
     public function store(Recaptcha $recaptcha)
     {
-        $this->validate(request(), [
+        request()->validate([
             'title' => 'required|spamfree',
             'body' => 'required|spamfree',
             'channel_id' => 'required|exists:channels,id',
-//            'g-recaptcha-response' => ['required', $recaptcha]
+            'g-recaptcha-response' => ['required', $recaptcha]
         ]);
 
         $thread = Thread::create([
@@ -118,10 +119,17 @@ class ThreadsController extends Controller
      * @param Thread $thread
      * @return Response
      */
-//    public function update($channel, Thread $thread)
-//    {
-//
-//    }
+    public function update($channel, Thread $thread)
+    {
+        $this->authorize('update', $thread);
+
+        $thread->update(request()->validate([
+            'title' => 'required|spamfree',
+            'body' => 'required|spamfree'
+        ]));
+
+        return $thread;
+    }
 
     /**
      * Remove the specified resource from storage.

@@ -58598,16 +58598,39 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     data: function data() {
         return {
             repliesCount: this.thread.replies_count,
-            closed: this.thread.closed
+            closed: this.thread.closed,
+            editing: false,
+            form: {}
         };
+    },
+    created: function created() {
+        this.resetForm();
     },
 
 
     methods: {
         toggleClose: function toggleClose() {
             this.closed = !this.closed;
+            var uri = '/closed-threads/' + this.thread.slug;
 
-            axios[this.closed ? 'delete' : 'post']('/closed-threads/' + this.thread.slug);
+            axios[this.closed ? 'delete' : 'post'](uri);
+        },
+        cancel: function cancel() {
+            this.resetForm();
+        },
+        update: function update() {
+            var uri = '/threads/' + this.thread.channel.slug + '/' + this.thread.slug;
+
+            axios.patch(uri, this.form).then(function () {
+                flash('Your thread have been updated');
+            });
+        },
+        resetForm: function resetForm() {
+            this.form = {
+                title: this.thread.title,
+                body: this.thread.body
+            };
+            this.editing = false;
         }
     }
 });
@@ -59323,7 +59346,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   })]), _vm._v(" "), (_vm.authorize('owns', _vm.reply) || _vm.authorize('owns', _vm.reply.thread)) ? _c('div', {
     staticClass: "panel-footer level"
   }, [_c('div', [_c('button', {
-    staticClass: "btn-btn-xs mr-1",
+    staticClass: "btn btn-xs mr-1",
     on: {
       "click": function($event) {
         _vm.editing = true

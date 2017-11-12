@@ -28,7 +28,6 @@ class ReadThreadsTest extends TestCase
     /** @test */
     function a_user_can_view_all_threads()
     {
-
         $this->get('/threads')
             ->assertSee($this->thread->title);
     }
@@ -36,7 +35,6 @@ class ReadThreadsTest extends TestCase
     /** @test */
     function a_user_can_view_single_thread()
     {
-
         $this->get($this->thread->path())
             ->assertSee($this->thread->title);
     }

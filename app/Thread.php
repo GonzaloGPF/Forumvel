@@ -6,10 +6,11 @@ use App\Events\ThreadReceivedNewReply;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Thread extends Model
 {
-    use RecordsActivity;
+    use RecordsActivity, Searchable;
 
     protected $fillable = [
         'slug', 'title', 'body' , 'user_id', 'channel_id', 'best_reply_id', 'closed'
