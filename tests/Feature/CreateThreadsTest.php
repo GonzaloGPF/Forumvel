@@ -164,8 +164,8 @@ class CreateThreadsTest extends TestCase
 
     function publishThread($attributes = [])
     {
-        $this->withExceptionHandling()
-            ->signIn();
+        $this->withExceptionHandling();
+        $this->signIn();
 
         $thread = make(Thread::class, $attributes);
 

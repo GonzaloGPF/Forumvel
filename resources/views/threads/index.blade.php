@@ -16,9 +16,11 @@
                     <div class="panel-body">
                         <form action="/threads/search" method="GET">
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Search for...">
+                                <input type="text" class="form-control" placeholder="Search for..." name="q">
                                 <span class="input-group-btn">
-                                     <button class="btn btn-default" name="q">Search</button>
+                                     <button class="btn btn-default">
+                                         <img src="{{asset('images/algolia-mark-blue.png')}}" alt="Algolia" style="width:24px; height:24px">
+                                     </button>
                                 </span>
                             </div>
                         </form>

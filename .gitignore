@@ -13,6 +13,7 @@ npm-debug.log
 node_modules/
 _ide_helper.php
 .phpstorm.meta.php
+.vscode
 
 # Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
 .rocketeer/

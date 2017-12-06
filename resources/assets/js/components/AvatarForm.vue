@@ -7,14 +7,12 @@
             </h1>
         </div>
 
-
         <form v-if="canUpdate" method="post" enctype="multipart/form-data">
             <!-- because image-upload only has one element, attributes will merge (name in this case) -->
             <image-upload name="avatar" class="mr-1" @loaded="onLoad"></image-upload>
         </form>
 
     </div>
-
 </template>
 <script>
     import ImageUpload from './ImageUpload.vue';

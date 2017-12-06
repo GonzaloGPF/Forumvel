@@ -1,5 +1,6 @@
-
 window._ = require('lodash');
+
+import InstantSearch from 'vue-instantsearch';
 
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
@@ -14,6 +15,8 @@ try {
 } catch (e) {}
 
 window.Vue = require('vue');
+
+Vue.use(InstantSearch);
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests

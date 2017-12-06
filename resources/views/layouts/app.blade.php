@@ -13,7 +13,8 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.1/trix.css">
 
     <style>
         body {
@@ -39,6 +40,11 @@
 
         [v-cloak] {
             display: none;
+        }
+
+        .ais-highlight > em {
+            background-color: yellow;
+            font-style: normal;
         }
     </style>
     @yield('header')

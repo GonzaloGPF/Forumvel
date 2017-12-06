@@ -48,6 +48,15 @@ class Thread extends Model
     }
 
     /**
+     * This methods indicates Algolia's what attributes will be exposed.
+     * In this case, we will keep everything and will add a new 'path' attribute that will be useful for front end
+     */
+    public function toSearchableArray()
+    {
+        return $this->toArray() + ['path' => $this->path()];
+    }
+
+    /**
      * @param null $extra
      * @return string
      */
