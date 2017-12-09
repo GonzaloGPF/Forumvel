@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
@@ -18,6 +19,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(ThreadsTableSeeder::class);
 
+        factory(\App\User::class)->states('admin')->create();
         factory(\App\User::class)->states('test')->create();
     }
 

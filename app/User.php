@@ -54,7 +54,7 @@ class User extends Authenticatable
 
     public function isAdmin()
     {
-        return in_array($this->name, ['Zalo']);
+        return in_array($this->email, ['admin@mail.com']);
     }
 
     public function confirm()

@@ -35,15 +35,15 @@ $factory->state(App\User::class, 'unconfirmed', function() {
 
 $factory->state(\App\User::class, 'admin', function() {
     return [
-        'name' => 'Zalo'
+        'name' => 'Admin',
+        'email' => 'admin@mail.com'
     ];
 });
 
 $factory->state(\App\User::class, 'test', function() {
     return [
-        'name' => 'Zalo',
-        'confirmed' => true,
-        'email' => 'mail@mail.com'
+        'name' => 'Test',
+        'email' => 'test@mail.com'
     ];
 });
 

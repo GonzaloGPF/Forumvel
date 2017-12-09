@@ -2,14 +2,10 @@
     <div>
         <div v-if="isLogged">
             <div class="form-group">
-            <textarea class="form-control"
-                      name="body"
-                      id="body"
-                      required
-                      placeholder="Have something to say?"
-                      rows="5"
-                      v-model="body">
-            </textarea>
+                <wysiwyg name="body"
+                         v-model="body"
+                         placeholder="Have something to say?"
+                         :shouldClear="completed"></wysiwyg>
             </div>
 
             <button class="btn btn-default" @click="addReply">Post</button>
@@ -28,7 +24,8 @@
 
         data(){
             return {
-                body: ''
+                body: '',
+                completed: false
             }
         },
 
@@ -56,7 +53,11 @@
 
                 }).then(({data}) => {
                     this.body = '';
-
+                    // After Reply is added, we would like to clean up the wysiwyg form.
+                    // We could use this.$refs.trix.$refs.trix.value = '';
+                    // Or we could make child listen to parent with this.$parent.on('event', callback)
+                    // But instead, we will use a data driven approach using a 'completed' property
+                    this.completed = true;
                     this.$emit('created', data);
                     flash('Your reply has been sent');
                 })
