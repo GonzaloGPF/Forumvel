@@ -25,6 +25,7 @@ trait Favoritable
         $attributes = ['user_id' => Auth::id()];
 
         if (!$this->favorites()->where($attributes)->exists()) {
+            Reputation::award($this->owner, Reputation::REPLY_FAVORITED);
             // Because it's a polimorphic relationship it only needs 'user_id',
             // it will fetch 'favorited_id' and 'favorited_type' automatically from $attributes
             return $this->favorites()->create($attributes);
@@ -34,6 +35,7 @@ trait Favoritable
     public function unfavorite()
     {
         $attributes = ['user_id' => Auth::id()];
+        Reputation::reduce($this->owner, Reputation::REPLY_FAVORITED);
 
         // Call delete() on every model instance to trigger deleting event
         $this->favorites()->where($attributes)->get()->each->delete();

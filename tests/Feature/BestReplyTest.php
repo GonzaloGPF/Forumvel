@@ -43,7 +43,7 @@ class BestReplyTest extends TestCase
         $this->signIn(create(User::class));
 
         $this->postJson(route('best-replies.store', [$replies[1]->id]))
-        ->assertStatus(Response::HTTP_FORBIDDEN);
+            ->assertStatus(Response::HTTP_FORBIDDEN);
 
         $this->assertFalse($replies[1]->fresh()->isBest());
     }

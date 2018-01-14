@@ -4,16 +4,12 @@ namespace Tests\Unit;
 
 use App\Channel;
 use App\Notifications\ThreadWasUpdated;
-use App\Reply;
 use App\Thread;
 use App\User;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ThreadTest extends TestCase
 {
@@ -32,25 +28,25 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
-    public function a_thread_has_a_path()
+    function a_thread_has_a_path()
     {
         $this->assertEquals("/threads/{$this->thread->channel->slug}/{$this->thread->slug}", $this->thread->path());
     }
 
     /** @test */
-    public function a_thread_has_a_creator()
+    function a_thread_has_a_creator()
     {
         $this->assertInstanceOf(User::class, $this->thread->creator);
     }
 
     /** @test */
-    public function a_thread_has_replies()
+    function a_thread_has_replies()
     {
         $this->assertInstanceOf(Collection::class, $this->thread->replies);
     }
 
     /** @test */
-    public function a_thread_can_add_a_reply()
+    function a_thread_can_add_a_reply()
     {
         $this->thread->addReply([
             'body' => 'foobar',
@@ -60,13 +56,13 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
-    public function a_thread_belongs_to_a_channel()
+    function a_thread_belongs_to_a_channel()
     {
         $this->assertInstanceOf(Channel::class, $this->thread->channel);
     }
 
     /** @test */
-    public function a_thread_can_be_subscribed_to()
+    function a_thread_can_be_subscribed_to()
     {
         $this->thread->subscribe($userId = 1);
 
@@ -74,7 +70,7 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
-    public function a_thread_can_be_unsubscribe_from()
+    function a_thread_can_be_unsubscribe_from()
     {
         $this->thread->subscribe($userId = 1);
         $this->thread->unsubscribe($userId);
@@ -83,7 +79,7 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
-    public function it_knows_if_authenticated_users_is_subscribed_to_it()
+    function it_knows_if_authenticated_users_is_subscribed_to_it()
     {
         $this->signIn();
 
@@ -95,7 +91,7 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
-    public function a_thread_notifies_all_subscribers_when_a_reply_is_added()
+    function a_thread_notifies_all_subscribers_when_a_reply_is_added()
     {
         Notification::fake();
 
@@ -113,7 +109,7 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
-    public function a_thread_can_check_if_authenticated_user_has_read_all_replies()
+    function a_thread_can_check_if_authenticated_user_has_read_all_replies()
     {
         $this->signIn();
 
@@ -123,9 +119,17 @@ class ThreadTest extends TestCase
 
         $this->assertFalse($this->thread->hasUpdatesFor());
     }
+
+    /** @test */
+    function a_thread_body_is_sanitized_automatically()
+    {
+        $thread = make(Thread::class, ['body' => '<script>alert(\'bad\');</script><p>This is ok.</p>']);
+
+        $this->assertEquals('<p>This is ok.</p>', $thread->body);
+    }
     
 //    /** @test */
-//    public function a_thread_records_each_visit()
+//    function a_thread_records_each_visit()
 //    {
 //        $thread = make(Thread::class, ['id' => 1]);
 //

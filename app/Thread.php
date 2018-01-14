@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Stevebauman\Purify\Facades\Purify;
 
 class Thread extends Model
 {
@@ -35,11 +36,20 @@ class Thread extends Model
 
         static::created(function(Thread $thread){
             $thread->update(['slug' => $thread->title]);
+//            $thread->creator->increment('reputation', 10);
+            Reputation::award($thread->creator, Reputation::THREAD_WAS_PUBLISHED);
+            // if dont like static, you can use (new Reputation)->award(...)
         });
 
         static::deleting(function(Thread $thread){
             $thread->replies->each->delete();
+            Reputation::reduce($thread->creator, Reputation::THREAD_WAS_PUBLISHED);
         });
+    }
+
+    public function getBodyAttribute($body)
+    {
+        return Purify::clean($body);
     }
 
     public function getRouteKeyName()
@@ -175,5 +185,6 @@ class Thread extends Model
     public function markBestReply(Reply $reply)
     {
         $this->update(['best_reply_id' => $reply->id]);
+        Reputation::award($reply->owner, Reputation::BEST_REPLY_AWARD);
     }
 }

@@ -43,7 +43,7 @@
 
             <span class="flex">
                  <a href="{{ route('profile', $thread->creator) }}">
-                     {{ $thread->creator->name }}
+                     {{ $thread->creator->name }} ({{ $thread->creator->reputation }} XP)
                  </a> posted: <span v-text="form.title"></span>
              </span>
         </div>
